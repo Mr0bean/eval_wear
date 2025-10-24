@@ -1,0 +1,24 @@
+{
+  "name": "ai-model-image-comparison",
+  "version": "1.0.0",
+  "description": "AI模型图片效果对比系统 - 多模型服装生成效果可视化对比平台",
+  "main": "server.js",
+  "scripts": {
+    "scan": "node scan-images.js",
+    "start": "node server.js",
+    "dev": "node scan-images.js && node server.js",
+    "rescan": "node scan-images.js"
+  },
+  "keywords": [
+    "ai",
+    "image",
+    "comparison",
+    "visualization",
+    "fashion"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=12.0.0"
+  }
+}

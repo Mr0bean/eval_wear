@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI模型图片效果对比</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .controls {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .view-toggle-section {
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .view-toggle-section h3 {
+            margin: 0;
+            color: #495057;
+            font-size: 1.1em;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 30px;
+            padding: 4px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .toggle-option {
+            padding: 10px 24px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 500;
+            color: #667eea;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .toggle-option.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+        }
+
+        .toggle-icon {
+            margin-right: 8px;
+        }
+
+        .filter-section {
+            margin-bottom: 20px;
+        }
+
+        .filter-section h3 {
+            margin-bottom: 15px;
+            color: #495057;
+            font-size: 1.1em;
+        }
+
+        .category-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .category-btn {
+            padding: 10px 24px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+            font-weight: 500;
+        }
+
+        .category-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .category-btn.active {
+            background: #667eea;
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .model-checkboxes {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .checkbox-item label {
+            cursor: pointer;
+            font-size: 0.95em;
+            color: #495057;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #6c757d;
+            font-size: 1.2em;
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        .comparison-grid {
+            display: grid;
+            gap: 40px;
+        }
+
+        .clothing-item {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .clothing-item h3 {
+            margin-bottom: 20px;
+            color: #212529;
+            font-size: 1.4em;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .model-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .model-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .model-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .model-card h4 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1em;
+        }
+
+        .image-container {
+            position: relative;
+            width: 100%;
+            padding-top: 133.33%; /* 3:4 aspect ratio */
+            background: #f1f3f5;
+            overflow: hidden;
+        }
+
+        .image-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .image-container img:hover {
+            transform: scale(1.05);
+        }
+
+        /* 多图轮播样式 */
+        .carousel-nav {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px 12px;
+            border-radius: 20px;
+        }
+
+        .carousel-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .carousel-dot:hover {
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .carousel-dot.active {
+            background: white;
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        .carousel-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 36px;
+            height: 36px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            z-index: 10;
+            opacity: 0;
+        }
+
+        .image-container:hover .carousel-arrow {
+            opacity: 1;
+        }
+
+        .carousel-arrow:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .carousel-arrow.prev {
+            left: 10px;
+        }
+
+        .carousel-arrow.next {
+            right: 10px;
+        }
+
+        .multi-image-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 500;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .image-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #adb5bd;
+            text-align: center;
+            width: 100%;
+            padding: 20px;
+        }
+
+        /* Modal for full-size image */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            position: relative;
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            top: 50%;
+            transform: translateY(-50%);
+            animation: zoomIn 0.3s ease;
+        }
+
+        @keyframes zoomIn {
+            from { transform: translateY(-50%) scale(0.8); }
+            to { transform: translateY(-50%) scale(1); }
+        }
+
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: #667eea;
+        }
+
+        .modal-caption {
+            text-align: center;
+            color: #fff;
+            padding: 20px;
+            font-size: 1.2em;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px;
+            color: #6c757d;
+            font-size: 1.2em;
+        }
+
+        .select-all-btn {
+            padding: 10px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .select-all-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .model-comparison {
+                grid-template-columns: 1fr;
+            }
+
+            .model-checkboxes {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AI模型图片效果对比系统</h1>
+            <p>多模型服装生成效果可视化对比平台</p>
+        </div>
+
+        <div class="controls">
+            <div class="view-toggle-section">
+                <h3>对比视图</h3>
+                <div class="toggle-switch">
+                    <div class="toggle-option active" id="viewByClothing" onclick="toggleView('clothing')">
+                        <span class="toggle-icon">👕</span>
+                        按服装分组
+                    </div>
+                    <div class="toggle-option" id="viewByModel" onclick="toggleView('model')">
+                        <span class="toggle-icon">🤖</span>
+                        按模型分组
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <h3>选择服装类别</h3>
+                <div class="category-buttons" id="categoryButtons">
+                    <button class="category-btn active" data-category="all">全部</button>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <h3>选择对比模型</h3>
+                <button class="select-all-btn" id="selectAllBtn">全选/取消全选</button>
+                <div class="model-checkboxes" id="modelCheckboxes"></div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="loading" id="loading">正在加载数据</div>
+            <div class="comparison-grid" id="comparisonGrid" style="display: none;"></div>
+            <div class="no-results" id="noResults" style="display: none;">
+                没有找到匹配的结果，请调整筛选条件
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for full-size image -->
+    <div id="imageModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modalImage">
+        <div class="modal-caption" id="modalCaption"></div>
+    </div>
+
+    <script>
+        // Data structure to store all images
+        let imageData = {};
+        let categories = new Set();
+        let models = [];
+        let selectedCategory = 'all';
+        let selectedModels = new Set();
+        let viewMode = 'clothing'; // 'clothing' or 'model'
+
+        // Initialize the application
+        async function init() {
+            await loadImageData();
+            renderCategoryButtons();
+            renderModelCheckboxes();
+            renderComparison();
+            setupEventListeners();
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('comparisonGrid').style.display = 'block';
+        }
+
+        // Load image data from JSON file
+        async function loadImageData() {
+            try {
+                const response = await fetch('image-data.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+
+                // Set models
+                models = data.models;
+                models.forEach(model => selectedModels.add(model));
+
+                // Set categories and imageData
+                imageData = data.categories;
+                Object.keys(imageData).forEach(category => {
+                    if (category !== 'image') { // 排除空的image类别
+                        categories.add(category);
+                    }
+                });
+
+                console.log('图片数据加载成功:', {
+                    模型数量: models.length,
+                    类别数量: categories.size,
+                    类别列表: Array.from(categories)
+                });
+            } catch (error) {
+                console.error('加载图片数据失败:', error);
+                document.getElementById('loading').textContent = '加载失败，请确保 image-data.json 文件存在';
+            }
+        }
+
+        // Render category buttons
+        function renderCategoryButtons() {
+            const container = document.getElementById('categoryButtons');
+            const allButton = container.querySelector('[data-category="all"]');
+
+            categories.forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn';
+                btn.dataset.category = category;
+                btn.textContent = category;
+                btn.onclick = () => selectCategory(category);
+                container.appendChild(btn);
+            });
+        }
+
+        // Render model checkboxes
+        function renderModelCheckboxes() {
+            const container = document.getElementById('modelCheckboxes');
+
+            models.forEach(model => {
+                const div = document.createElement('div');
+                div.className = 'checkbox-item';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `model-${model}`;
+                checkbox.checked = true;
+                checkbox.onchange = () => toggleModel(model);
+
+                const label = document.createElement('label');
+                label.htmlFor = `model-${model}`;
+                label.textContent = model;
+
+                div.appendChild(checkbox);
+                div.appendChild(label);
+                div.onclick = (e) => {
+                    if (e.target !== checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                        toggleModel(model);
+                    }
+                };
+
+                container.appendChild(div);
+            });
+        }
+
+        // Select category
+        function selectCategory(category) {
+            selectedCategory = category;
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.category === category);
+            });
+            renderComparison();
+        }
+
+        // Toggle model selection
+        function toggleModel(model) {
+            if (selectedModels.has(model)) {
+                selectedModels.delete(model);
+            } else {
+                selectedModels.add(model);
+            }
+            renderComparison();
+        }
+
+        // Select/deselect all models
+        function toggleSelectAll() {
+            if (selectedModels.size === models.length) {
+                selectedModels.clear();
+                models.forEach(model => {
+                    document.getElementById(`model-${model}`).checked = false;
+                });
+            } else {
+                models.forEach(model => {
+                    selectedModels.add(model);
+                    document.getElementById(`model-${model}`).checked = true;
+                });
+            }
+            renderComparison();
+        }
+
+        // Toggle view mode
+        function toggleView(mode) {
+            viewMode = mode;
+
+            // Update UI
+            document.getElementById('viewByClothing').classList.toggle('active', mode === 'clothing');
+            document.getElementById('viewByModel').classList.toggle('active', mode === 'model');
+
+            // Re-render
+            renderComparison();
+        }
+
+        // Create image container with carousel support for multiple images
+        function createImageContainer(imagePath, title, category, clothingName) {
+            const imageContainer = document.createElement('div');
+            imageContainer.className = 'image-container';
+
+            // Check if imagePath is an array (multiple images)
+            const isMultiple = Array.isArray(imagePath);
+            const paths = isMultiple ? imagePath : (imagePath ? [imagePath] : []);
+
+            if (paths.length === 0) {
+                imageContainer.innerHTML = '<div class="image-placeholder">暂无图片</div>';
+                return imageContainer;
+            }
+
+            // Add badge for multiple images
+            if (isMultiple && paths.length > 1) {
+                const badge = document.createElement('div');
+                badge.className = 'multi-image-badge';
+                badge.textContent = `${paths.length}张`;
+                imageContainer.appendChild(badge);
+            }
+
+            // Create image elements
+            let currentIndex = 0;
+            const images = [];
+
+            paths.forEach((path, index) => {
+                const img = document.createElement('img');
+                img.src = path;
+                img.alt = `${title} - ${clothingName}`;
+                img.style.display = index === 0 ? 'block' : 'none';
+                img.onerror = () => {
+                    img.style.display = 'none';
+                    if (images.filter(i => i.style.display !== 'none').length === 0) {
+                        imageContainer.innerHTML = '<div class="image-placeholder">图片加载失败</div>';
+                    }
+                };
+                img.onclick = () => openModal(path, `${title} - ${category} - ${clothingName}`);
+                imageContainer.appendChild(img);
+                images.push(img);
+            });
+
+            // Add carousel controls if multiple images
+            if (paths.length > 1) {
+                // Previous button
+                const prevBtn = document.createElement('button');
+                prevBtn.className = 'carousel-arrow prev';
+                prevBtn.innerHTML = '‹';
+                prevBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    currentIndex = (currentIndex - 1 + paths.length) % paths.length;
+                    updateCarousel();
+                };
+                imageContainer.appendChild(prevBtn);
+
+                // Next button
+                const nextBtn = document.createElement('button');
+                nextBtn.className = 'carousel-arrow next';
+                nextBtn.innerHTML = '›';
+                nextBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    currentIndex = (currentIndex + 1) % paths.length;
+                    updateCarousel();
+                };
+                imageContainer.appendChild(nextBtn);
+
+                // Dots navigation
+                const dotsNav = document.createElement('div');
+                dotsNav.className = 'carousel-nav';
+                const dots = [];
+
+                paths.forEach((_, index) => {
+                    const dot = document.createElement('div');
+                    dot.className = `carousel-dot ${index === 0 ? 'active' : ''}`;
+                    dot.onclick = (e) => {
+                        e.stopPropagation();
+                        currentIndex = index;
+                        updateCarousel();
+                    };
+                    dotsNav.appendChild(dot);
+                    dots.push(dot);
+                });
+
+                imageContainer.appendChild(dotsNav);
+
+                // Update carousel function
+                function updateCarousel() {
+                    images.forEach((img, index) => {
+                        img.style.display = index === currentIndex ? 'block' : 'none';
+                    });
+                    dots.forEach((dot, index) => {
+                        dot.className = `carousel-dot ${index === currentIndex ? 'active' : ''}`;
+                    });
+                }
+            }
+
+            return imageContainer;
+        }
+
+        // Render comparison grid
+        function renderComparison() {
+            if (viewMode === 'clothing') {
+                renderByClothing();
+            } else {
+                renderByModel();
+            }
+        }
+
+        // Render by clothing (original view)
+        function renderByClothing() {
+            const grid = document.getElementById('comparisonGrid');
+            const noResults = document.getElementById('noResults');
+            grid.innerHTML = '';
+
+            let hasResults = false;
+
+            const categoriesToShow = selectedCategory === 'all' ?
+                Array.from(categories) : [selectedCategory];
+
+            categoriesToShow.forEach(category => {
+                if (!imageData[category]) return;
+
+                Object.keys(imageData[category]).forEach(clothingName => {
+                    const clothingItem = document.createElement('div');
+                    clothingItem.className = 'clothing-item';
+
+                    const title = document.createElement('h3');
+                    title.textContent = `${category} - ${clothingName}`;
+                    clothingItem.appendChild(title);
+
+                    const modelComparison = document.createElement('div');
+                    modelComparison.className = 'model-comparison';
+
+                    let hasVisibleModels = false;
+                    Array.from(selectedModels).forEach(model => {
+                        const imagePath = imageData[category][clothingName][model];
+
+                        const modelCard = document.createElement('div');
+                        modelCard.className = 'model-card';
+
+                        const modelTitle = document.createElement('h4');
+                        modelTitle.textContent = model;
+                        modelCard.appendChild(modelTitle);
+
+                        // Use the new createImageContainer function
+                        const imageContainer = createImageContainer(imagePath, model, category, clothingName);
+                        modelCard.appendChild(imageContainer);
+                        modelComparison.appendChild(modelCard);
+                        hasVisibleModels = true;
+                    });
+
+                    if (hasVisibleModels) {
+                        clothingItem.appendChild(modelComparison);
+                        grid.appendChild(clothingItem);
+                        hasResults = true;
+                    }
+                });
+            });
+
+            grid.style.display = hasResults ? 'block' : 'none';
+            noResults.style.display = hasResults ? 'none' : 'block';
+        }
+
+        // Render by model (alternative view)
+        function renderByModel() {
+            const grid = document.getElementById('comparisonGrid');
+            const noResults = document.getElementById('noResults');
+            grid.innerHTML = '';
+
+            let hasResults = false;
+
+            const categoriesToShow = selectedCategory === 'all' ?
+                Array.from(categories) : [selectedCategory];
+
+            // Group by model instead of clothing
+            Array.from(selectedModels).forEach(model => {
+                const modelItem = document.createElement('div');
+                modelItem.className = 'clothing-item';
+
+                const title = document.createElement('h3');
+                title.textContent = `${model}`;
+                modelItem.appendChild(title);
+
+                const clothingComparison = document.createElement('div');
+                clothingComparison.className = 'model-comparison';
+
+                let hasVisibleClothing = false;
+
+                // Iterate through categories and clothing items
+                categoriesToShow.forEach(category => {
+                    if (!imageData[category]) return;
+
+                    Object.keys(imageData[category]).forEach(clothingName => {
+                        const imagePath = imageData[category][clothingName][model];
+
+                        const clothingCard = document.createElement('div');
+                        clothingCard.className = 'model-card';
+
+                        const clothingTitle = document.createElement('h4');
+                        clothingTitle.textContent = `${category} - ${clothingName}`;
+                        clothingCard.appendChild(clothingTitle);
+
+                        // Use the new createImageContainer function
+                        const imageContainer = createImageContainer(imagePath, model, category, clothingName);
+                        clothingCard.appendChild(imageContainer);
+                        clothingComparison.appendChild(clothingCard);
+                        hasVisibleClothing = true;
+                    });
+                });
+
+                if (hasVisibleClothing) {
+                    modelItem.appendChild(clothingComparison);
+                    grid.appendChild(modelItem);
+                    hasResults = true;
+                }
+            });
+
+            grid.style.display = hasResults ? 'block' : 'none';
+            noResults.style.display = hasResults ? 'none' : 'block';
+        }
+
+        // Open modal with full-size image
+        function openModal(imageSrc, caption) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            const modalCaption = document.getElementById('modalCaption');
+
+            modal.style.display = 'block';
+            modalImg.src = imageSrc;
+            modalCaption.textContent = caption;
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Close modal
+            document.querySelector('.close').onclick = function() {
+                document.getElementById('imageModal').style.display = 'none';
+            };
+
+            // Close modal on background click
+            document.getElementById('imageModal').onclick = function(e) {
+                if (e.target === this) {
+                    this.style.display = 'none';
+                }
+            };
+
+            // Select all button
+            document.getElementById('selectAllBtn').onclick = toggleSelectAll;
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    document.getElementById('imageModal').style.display = 'none';
+                }
+            });
+        }
+
+        // Start the application
+        init();
+    </script>
+</body>
+</html>
