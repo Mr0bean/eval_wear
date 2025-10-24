@@ -115,7 +115,26 @@ function scanModelDirectories() {
 
                             // 初始化服装项
                             if (!imageData.categories[category][clothingName]) {
-                                imageData.categories[category][clothingName] = {};
+                                imageData.categories[category][clothingName] = {
+                                    _clothingImage: null
+                                };
+                            }
+
+                            // 查找服装原图（在白底_compressed文件夹中）
+                            if (!imageData.categories[category][clothingName]._clothingImage) {
+                                // 白底_compressed在父目录
+                                const compressedPath = path.join(ROOT_DIR, '..', '白底_compressed', category);
+                                if (fs.existsSync(compressedPath)) {
+                                    const clothingImageFiles = fs.readdirSync(compressedPath).filter(file => {
+                                        const fileName = path.parse(file).name;
+                                        return fileName === clothingName && /\.(png|jpg|jpeg|webp)$/i.test(file);
+                                    });
+                                    if (clothingImageFiles.length > 0) {
+                                        const absolutePath = path.join(compressedPath, clothingImageFiles[0]);
+                                        imageData.categories[category][clothingName]._clothingImage =
+                                            path.relative(ROOT_DIR, absolutePath);
+                                    }
+                                }
                             }
 
                             // 如果只有一张图，存储为字符串；多张则存储为数组

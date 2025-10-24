@@ -224,7 +224,7 @@
         }
 
         .reference-section {
-            flex: 0 0 300px;
+            flex: 0 0 320px;
             background: white;
             border-radius: 12px;
             padding: 20px;
@@ -242,11 +242,34 @@
             gap: 8px;
         }
 
+        .reference-images {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .reference-image-wrapper {
+            text-align: center;
+        }
+
+        .reference-image-label {
+            font-size: 0.85em;
+            color: #6c757d;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
         .reference-image {
             width: 100%;
             border-radius: 8px;
-            margin-bottom: 15px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .reference-image:hover {
+            transform: scale(1.05);
         }
 
         .prompt-box {
@@ -870,15 +893,54 @@
                     refTitle.innerHTML = '📋 参考信息';
                     referenceSection.appendChild(refTitle);
 
-                    // Original image
+                    // Reference images container
+                    const refImagesContainer = document.createElement('div');
+                    refImagesContainer.className = 'reference-images';
+
+                    // Get clothing image from the clothing data
+                    const clothingImage = imageData[category][clothingName]._clothingImage;
+
+                    // Model image
                     if (categoryMeta.originalImage) {
+                        const modelWrapper = document.createElement('div');
+                        modelWrapper.className = 'reference-image-wrapper';
+
+                        const modelLabel = document.createElement('div');
+                        modelLabel.className = 'reference-image-label';
+                        modelLabel.textContent = '模特';
+                        modelWrapper.appendChild(modelLabel);
+
                         const refImg = document.createElement('img');
                         refImg.src = categoryMeta.originalImage;
-                        refImg.alt = '原图';
+                        refImg.alt = '模特图';
                         refImg.className = 'reference-image';
-                        refImg.onclick = () => openModal(categoryMeta.originalImage, `原图 - ${category}`);
-                        referenceSection.appendChild(refImg);
+                        refImg.onclick = () => openModal(categoryMeta.originalImage, `模特图 - ${category}`);
+                        modelWrapper.appendChild(refImg);
+
+                        refImagesContainer.appendChild(modelWrapper);
                     }
+
+                    // Clothing image
+                    if (clothingImage) {
+                        const clothingWrapper = document.createElement('div');
+                        clothingWrapper.className = 'reference-image-wrapper';
+
+                        const clothingLabel = document.createElement('div');
+                        clothingLabel.className = 'reference-image-label';
+                        clothingLabel.textContent = '衣服';
+                        clothingWrapper.appendChild(clothingLabel);
+
+                        const clothingImg = document.createElement('img');
+                        clothingImg.src = clothingImage;
+                        clothingImg.alt = '衣服原图';
+                        clothingImg.className = 'reference-image';
+                        clothingImg.onclick = () => openModal(clothingImage, `衣服原图 - ${clothingName}`);
+                        clothingWrapper.appendChild(clothingImg);
+
+                        refImagesContainer.appendChild(clothingWrapper);
+                    }
+
+                    referenceSection.appendChild(refImagesContainer);
 
                     // Prompt
                     if (categoryMeta.prompt) {
