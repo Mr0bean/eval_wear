@@ -122,8 +122,8 @@ function scanModelDirectories() {
 
                             // 查找服装原图（在白底_compressed文件夹中）
                             if (!imageData.categories[category][clothingName]._clothingImage) {
-                                // 白底_compressed在父目录
-                                const compressedPath = path.join(ROOT_DIR, '..', '白底_compressed', category);
+                                // 白底_compressed在test_results目录下
+                                const compressedPath = path.join(ROOT_DIR, '白底_compressed', category);
                                 if (fs.existsSync(compressedPath)) {
                                     const clothingImageFiles = fs.readdirSync(compressedPath).filter(file => {
                                         const fileName = path.parse(file).name;
