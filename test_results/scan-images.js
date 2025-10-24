@@ -30,7 +30,8 @@ function scanModelDirectories() {
                 return !name.startsWith('.') &&
                        name !== 'node_modules' &&
                        name !== '白底' &&
-                       name !== '白底 copy';
+                       name !== '白底 copy' &&
+                       name !== '白底_compressed';
             })
             .map(entry => entry.name);
 
