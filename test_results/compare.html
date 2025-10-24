@@ -217,7 +217,62 @@
             border-bottom: 3px solid #667eea;
         }
 
+        .clothing-content {
+            display: flex;
+            gap: 25px;
+            align-items: flex-start;
+        }
+
+        .reference-section {
+            flex: 0 0 300px;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 20px;
+        }
+
+        .reference-section h4 {
+            margin: 0 0 15px 0;
+            color: #667eea;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reference-image {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .prompt-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .prompt-box h5 {
+            margin: 0 0 10px 0;
+            color: #495057;
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+
+        .prompt-box p {
+            margin: 0;
+            color: #6c757d;
+            font-size: 0.85em;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
         .model-comparison {
+            flex: 1;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
@@ -448,6 +503,15 @@
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 1.8em;
+            }
+
+            .clothing-content {
+                flex-direction: column;
+            }
+
+            .reference-section {
+                flex: 1 1 auto;
+                position: static;
             }
 
             .model-comparison {
@@ -779,13 +843,60 @@
             categoriesToShow.forEach(category => {
                 if (!imageData[category]) return;
 
+                // Get metadata for this category
+                const categoryMeta = imageData[category]._meta || {};
+
                 Object.keys(imageData[category]).forEach(clothingName => {
+                    // Skip metadata entries
+                    if (clothingName === '_meta') return;
+
                     const clothingItem = document.createElement('div');
                     clothingItem.className = 'clothing-item';
 
                     const title = document.createElement('h3');
                     title.textContent = `${category} - ${clothingName}`;
                     clothingItem.appendChild(title);
+
+                    // Create container for reference and models
+                    const clothingContent = document.createElement('div');
+                    clothingContent.className = 'clothing-content';
+
+                    // Add reference section (original image and prompt)
+                    const referenceSection = document.createElement('div');
+                    referenceSection.className = 'reference-section';
+
+                    // Reference title
+                    const refTitle = document.createElement('h4');
+                    refTitle.innerHTML = '📋 参考信息';
+                    referenceSection.appendChild(refTitle);
+
+                    // Original image
+                    if (categoryMeta.originalImage) {
+                        const refImg = document.createElement('img');
+                        refImg.src = categoryMeta.originalImage;
+                        refImg.alt = '原图';
+                        refImg.className = 'reference-image';
+                        refImg.onclick = () => openModal(categoryMeta.originalImage, `原图 - ${category}`);
+                        referenceSection.appendChild(refImg);
+                    }
+
+                    // Prompt
+                    if (categoryMeta.prompt) {
+                        const promptBox = document.createElement('div');
+                        promptBox.className = 'prompt-box';
+
+                        const promptTitle = document.createElement('h5');
+                        promptTitle.textContent = 'Prompt:';
+                        promptBox.appendChild(promptTitle);
+
+                        const promptText = document.createElement('p');
+                        promptText.textContent = categoryMeta.prompt;
+                        promptBox.appendChild(promptText);
+
+                        referenceSection.appendChild(promptBox);
+                    }
+
+                    clothingContent.appendChild(referenceSection);
 
                     const modelComparison = document.createElement('div');
                     modelComparison.className = 'model-comparison';
@@ -809,7 +920,8 @@
                     });
 
                     if (hasVisibleModels) {
-                        clothingItem.appendChild(modelComparison);
+                        clothingContent.appendChild(modelComparison);
+                        clothingItem.appendChild(clothingContent);
                         grid.appendChild(clothingItem);
                         hasResults = true;
                     }
@@ -849,7 +961,13 @@
                 categoriesToShow.forEach(category => {
                     if (!imageData[category]) return;
 
+                    // Get metadata for this category
+                    const categoryMeta = imageData[category]._meta || {};
+
                     Object.keys(imageData[category]).forEach(clothingName => {
+                        // Skip metadata entries
+                        if (clothingName === '_meta') return;
+
                         const imagePath = imageData[category][clothingName][model];
 
                         const clothingCard = document.createElement('div');

@@ -1,8 +1,23 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 const PORT = 8080;
+
+// 获取本机局域网IP地址
+function getLocalIP() {
+    const interfaces = os.networkInterfaces();
+    for (const name of Object.keys(interfaces)) {
+        for (const iface of interfaces[name]) {
+            // 跳过内部IP和非IPv4地址
+            if (iface.family === 'IPv4' && !iface.internal) {
+                return iface.address;
+            }
+        }
+    }
+    return 'localhost';
+}
 
 // MIME types
 const mimeTypes = {
@@ -53,12 +68,14 @@ const server = http.createServer((req, res) => {
     });
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
+    const localIP = getLocalIP();
     console.log('=================================');
     console.log('   AI模型图片对比系统启动成功!   ');
     console.log('=================================');
-    console.log(`服务器运行在: http://localhost:${PORT}`);
-    console.log(`\n请在浏览器中打开上述地址查看对比页面`);
+    console.log(`本地访问: http://localhost:${PORT}`);
+    console.log(`局域网访问: http://${localIP}:${PORT}`);
+    console.log(`\n局域网内的其他设备可以通过上述地址访问`);
     console.log(`\n按 Ctrl+C 停止服务器`);
     console.log('=================================\n');
 });

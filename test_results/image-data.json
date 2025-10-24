@@ -1,6 +1,10 @@
 {
   "categories": {
     "上衣": {
+      "_meta": {
+        "prompt": "Based on the existing model: blonde shoulder-length hair, natural facial features, standing posture (feet shoulder-width apart, weight slightly shifted to one side, upright upper body, shoulders relaxed, gaze forward). Replace her current outfit with a clothes",
+        "originalImage": "Grok Imagine（Aurora）/白底/上衣/模特.png"
+      },
       "军绿色撞色波浪针织衫": {
         "Grok Imagine(Aurora)": "Grok Imagine（Aurora）/白底/上衣/军绿色撞色波浪针织衫.jpg",
         "Gemini 2.5 Flash Image Nano Banana": "√ Gemini 2.5 Flash Image Nano Banana/白底_compressed/上衣/军绿色撞色波浪针织衫.png",
@@ -58,6 +62,10 @@
       }
     },
     "下装": {
+      "_meta": {
+        "prompt": "Based on the existing model: blonde shoulder-length hair, natural facial features, standing posture (feet shoulder-width apart, weight slightly shifted to one side, upright upper body, shoulders relaxed, gaze forward). Replace her current outfit with a skirt/trousers",
+        "originalImage": "Grok Imagine（Aurora）/白底/下装/模特.png"
+      },
       "格纹拼接不对称半身裙": {
         "Grok Imagine(Aurora)": "Grok Imagine（Aurora）/白底/下装/格纹拼接不对称半身裙.jpg",
         "Gemini 2.5 Flash Image Nano Banana": "√ Gemini 2.5 Flash Image Nano Banana/白底_compressed/下装/格纹拼接不对称半身裙.png",
@@ -103,6 +111,10 @@
       }
     },
     "外套": {
+      "_meta": {
+        "prompt": "Based on the existing model: blonde shoulder-length hair, natural facial features, standing posture (feet shoulder-width apart, weight slightly shifted to one side, upright upper body, shoulders relaxed, gaze forward). Replace her current outfit with a coat",
+        "originalImage": "Grok Imagine（Aurora）/白底/外套/模特.png"
+      },
       "咖啡色毛领长款大衣": {
         "Grok Imagine(Aurora)": "Grok Imagine（Aurora）/白底/外套/咖啡色毛领长款大衣.jpg",
         "Gemini 2.5 Flash Image Nano Banana": "√ Gemini 2.5 Flash Image Nano Banana/白底_compressed/外套/咖啡色毛领长款大衣.png",
@@ -146,12 +158,12 @@
   },
   "models": [
     "Grok Imagine(Aurora)",
+    "nano_banana",
     "Gemini 2.5 Flash Image Nano Banana",
     "HunyuanImage 换衣 无提示词",
     "chatgpt",
     "doubao_seedream 4.0",
     "jimeng",
-    "nano_banana",
     "qwen",
     "可灵 无提示词",
     "百度文心 4.5 Turbo",

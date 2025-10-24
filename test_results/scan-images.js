@@ -5,6 +5,13 @@ const path = require('path');
 const ROOT_DIR = __dirname;
 const OUTPUT_FILE = path.join(ROOT_DIR, 'image-data.json');
 
+// Prompt定义
+const PROMPTS = {
+    '上衣': 'Based on the existing model: blonde shoulder-length hair, natural facial features, standing posture (feet shoulder-width apart, weight slightly shifted to one side, upright upper body, shoulders relaxed, gaze forward). Replace her current outfit with a clothes',
+    '下装': 'Based on the existing model: blonde shoulder-length hair, natural facial features, standing posture (feet shoulder-width apart, weight slightly shifted to one side, upright upper body, shoulders relaxed, gaze forward). Replace her current outfit with a skirt/trousers',
+    '外套': 'Based on the existing model: blonde shoulder-length hair, natural facial features, standing posture (feet shoulder-width apart, weight slightly shifted to one side, upright upper body, shoulders relaxed, gaze forward). Replace her current outfit with a coat'
+};
+
 // 扫描所有模型文件夹
 function scanModelDirectories() {
     const imageData = {
@@ -65,7 +72,18 @@ function scanModelDirectories() {
 
                     // 初始化类别
                     if (!imageData.categories[category]) {
-                        imageData.categories[category] = {};
+                        imageData.categories[category] = {
+                            _meta: {
+                                prompt: PROMPTS[category] || '',
+                                originalImage: null
+                            }
+                        };
+                    }
+
+                    // 查找原图（模特.png）
+                    const modelImagePath = path.join(categoryPath, '模特.png');
+                    if (fs.existsSync(modelImagePath) && !imageData.categories[category]._meta.originalImage) {
+                        imageData.categories[category]._meta.originalImage = path.relative(ROOT_DIR, modelImagePath);
                     }
 
                     // 扫描类别下的所有图片
